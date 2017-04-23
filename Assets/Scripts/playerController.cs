@@ -43,6 +43,7 @@ public class playerController : MonoBehaviour {
 
 		this.gravityScale = this.rBody.gravityScale;
 	
+		StartCoroutine(this.CheckForBoundryManager());
 	}
 
 	// Update is called once per frame
@@ -116,6 +117,20 @@ public class playerController : MonoBehaviour {
 		else {
 
 			this.rBody.velocity = Vector2.zero;
+		}
+	}
+
+	private IEnumerator CheckForBoundryManager() {
+
+		while(true) {
+			int mask = 1 << 10;
+			RaycastHit2D hit = Physics2D.Raycast(this.transform.localPosition, Vector2.zero, 0, mask, -10, 10);
+			if(hit != null && hit.collider != null) {
+
+				Camera.main.GetComponent<CameraManager>().BoundriesChanged((BoxCollider2D)hit.collider);
+			}
+
+			yield return null;
 		}
 	}
 
@@ -216,7 +231,7 @@ public class playerController : MonoBehaviour {
 
 		if(this.jump == true) {
 
-			this.rBody.AddForce(new Vector2(0,jumpHeight));
+			this.rBody.AddForce(new Vector2(0, jumpHeight));
 			this.jump = false;
 			this.jumpCharges--;
 		}

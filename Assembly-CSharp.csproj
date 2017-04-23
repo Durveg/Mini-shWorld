@@ -128,6 +128,7 @@
      <Compile Include="Assets\AstarPathfindingProject\Utilities\UnityReferenceHelper.cs" />
      <Compile Include="Assets\AstarPathfindingProject\changelog.cs" />
      <Compile Include="Assets\BoundryManager.cs" />
+     <Compile Include="Assets\CameraManager.cs" />
      <Compile Include="Assets\Enemy.cs" />
      <Compile Include="Assets\Heart.cs" />
      <Compile Include="Assets\Scripts\Bomb.cs" />
