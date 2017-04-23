@@ -13,11 +13,12 @@ public class HookShot : MonoBehaviour {
 	private LineRenderer hookShotLine = null;
 	private IEnumerator hookShotCoRoutine = null;
 	private SpriteRenderer sprite = null;
-
+	private playerController player = null;
 	// Use this for initialization
 	void Start () {
 
 		this.hookShotLine = this.GetComponentInChildren<LineRenderer>();
+		this.player = this.GetComponentInParent<playerController>();
 	}
 	
 	// Update is called once per frame
@@ -28,7 +29,7 @@ public class HookShot : MonoBehaviour {
 
 	private void getPlayerSprite() {
 
-		this.sprite = this.GetComponentInParent<playerController>().sprite;
+		this.sprite = this.player.sprite;
 	}
 
 	public void fireHookShot() {
@@ -43,9 +44,10 @@ public class HookShot : MonoBehaviour {
 			direction = Vector2.left;
 		}
 
+		int grappleCollision = 9;
+		int mask = 1 << grappleCollision;
 		Vector2 rayStart = new Vector2(this.transform.parent.localPosition.x + .5f * direction.x, this.transform.parent.localPosition.y);
-		RaycastHit2D rayHit = Physics2D.Raycast(rayStart, direction);
-
+		RaycastHit2D rayHit = Physics2D.Raycast(rayStart, direction, 200, mask);
 
 		Vector3[] positions = new Vector3[2];
 		positions[0] = this.transform.parent.localPosition;
@@ -66,10 +68,10 @@ public class HookShot : MonoBehaviour {
 			direction = Vector2.left;
 		}
 
-		Vector2 endPosition = new Vector2(this.transform.parent.localPosition.x + 4.5f * direction.x, this.transform.parent.localPosition.y);
+		Vector2 endPosition = new Vector2(this.transform.parent.localPosition.x + 3f * direction.x, this.transform.parent.localPosition.y);
 		if(hitPosition != null &&  hitPosition.transform.name == "GrapplePoint") {
 			
-			if(Vector2.Distance(this.transform.parent.localPosition, hitPosition.transform.localPosition) < 4.5f) {
+			if(Vector2.Distance(this.transform.parent.localPosition, hitPosition.transform.localPosition) < 6f) {
 			
 				endPosition = hitPosition.transform.localPosition;
 				this.hookShotCoRoutine = this.HookShotPulled(endPosition);
@@ -96,6 +98,7 @@ public class HookShot : MonoBehaviour {
 
 	private IEnumerator HookShotPulled(Vector2 endPosition) {
 
+		this.player.ZeroVelocity();
 		float hookPullSpeed = 25;
 		while(true) {
 

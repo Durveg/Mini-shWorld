@@ -5,6 +5,8 @@ using UnityEngine;
 public class Enemy : MonoBehaviour {
 
 	public float health = 2f;
+	public float damageDone = 0.5f;
+	public float knockBackValue = 250;
 
 	public void DamageDealt(float damageValue) {
 
@@ -20,6 +22,15 @@ public class Enemy : MonoBehaviour {
 			}
 
 			GameObject.Destroy(this.gameObject);
+		}
+	}
+
+	void OnCollisionEnter2D(Collision2D coll) {
+
+		playerController player = coll.gameObject.GetComponent<playerController>();
+		if(player != null) {
+
+			player.TakeDamage(damageDone, knockBackValue, this.transform.localPosition);
 		}
 	}
 }

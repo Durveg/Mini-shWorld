@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class playerController : MonoBehaviour {
 
+	public int health = 10;
+
 	public float jumpHeight = 350;
 	public float sideSpeed = 25;
-	public const float MAX_VELOCITY_X = 5;
+	public float MAX_VELOCITY_X = 5;
+	public float MAX_INVULN_TIME = 0.5f;
 
+	private bool invuln = false;
 	private bool applyUpForce = false;
 	private bool applyRightForce = false;
 	private bool applyLeftForce = false;
@@ -21,6 +25,7 @@ public class playerController : MonoBehaviour {
 	public SpriteRenderer sprite = null;
 	private HookShot hookShot = null;
 	private Sword sword = null;
+	private UIManager uiManager = null;
 
 	private float gravityScale = 0;
 	public float ladderSpeed = 2;
@@ -34,7 +39,10 @@ public class playerController : MonoBehaviour {
 		this.hookShot = this.GetComponentInChildren<HookShot>();
 		this.sword = this.GetComponentInChildren<Sword>();
 
+		this.uiManager = FindObjectOfType<UIManager>();
+
 		this.gravityScale = this.rBody.gravityScale;
+	
 	}
 
 	// Update is called once per frame
@@ -111,14 +119,55 @@ public class playerController : MonoBehaviour {
 		}
 	}
 
+	public void ZeroVelocity() {
+
+		this.rBody.velocity = Vector2.zero;
+	}
+
+	public void AdjustHealth(float adjustment) {
+
+		this.health += (int)(adjustment * 2);
+		this.uiManager.AdjustHearts(adjustment);
+	}
+
 	public void HealthRegen(float healthRegen) {
 
+		this.AdjustHealth(healthRegen);
 		//TODO: Heal 
 	}
 
-	public void TakeDamage() {
-		//TODO: Take Damage
-		Debug.Log("Damage");
+	private IEnumerator InvulnTimer() {
+
+		this.invuln = true;
+		float timer = 0;
+		while(true) {
+
+			timer += Time.deltaTime;
+
+			//TODO: Add flash effect to the invuln
+
+			if(timer >= MAX_INVULN_TIME) {
+
+				break;
+			}
+
+			yield return null;
+		}
+
+		this.invuln = false;
+	}
+
+	public void TakeDamage(float damage, float knockBackForce, Vector2 damageLocation) {
+
+		if(this.invuln == false) {
+		
+			Vector2 dir = (damageLocation - (Vector2)transform.localPosition).normalized * -1;
+			this.rBody.AddForce(dir * knockBackForce, ForceMode2D.Force);
+
+			this.AdjustHealth(-damage);
+
+			StartCoroutine(this.InvulnTimer());
+		}
 	}
 
 	public void PlayerOnLadder(bool onLadder) {

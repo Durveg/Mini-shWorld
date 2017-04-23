@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Bomb : MonoBehaviour {
 
-	public float explosionTimer = 1;
+	public float bombDamage = 0.5f;
+	public float bombForce = 2;
+	public float explosionTimer = 2;
 	private ArrayList collisions = null;
 	// Use this for initialization
 	void Start () {
@@ -29,7 +31,7 @@ public class Bomb : MonoBehaviour {
 				playerController player = coll.GetComponent<playerController>();
 				if(player != null) {
 
-					player.TakeDamage();
+					player.TakeDamage(this.bombDamage, this.bombForce, this.transform.localPosition);
 				}
 			}
 		}
