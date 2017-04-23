@@ -189,8 +189,6 @@ public class PlayerController : MonoBehaviour {
 
 	void FixedUpdate() {
 
-
-
 		if(this.applyLeftForce == false && this.applyRightForce == false && this.jumpCharges == this.maxJumpCharges) {
 
 			this.rBody.velocity = new Vector2(0, this.rBody.velocity.y);

@@ -7,13 +7,17 @@ public class CameraManager : MonoBehaviour {
 	#region Private Variables
 	private Collider2D boundry = null;
 	private PlayerController player = null;
+
+	private IEnumerator followPlayerCR;
+	private bool followingPlayer = false;
 	#endregion
 
 	#region Unity Methods
 	void Start () {
 
+		this.followPlayerCR = this.FollowPlayer();
 		StartCoroutine(this.GetPlayerRef()); //Get the reference to the player in a coroutine incase the camera is loaded before the player
-		StartCoroutine(this.FollowPlayer()); //Start following the player (does check for null pointers)
+		StartCoroutine(this.followPlayerCR); //Start following the player (does check for null pointers)
 	}
 	#endregion
 
@@ -24,7 +28,23 @@ public class CameraManager : MonoBehaviour {
 	private void BoundriesChanged(Collider2D coll) {
 
 		if(this.boundry != coll) {
+			
 			this.boundry = coll;
+
+			if(this.boundry.GetComponent<BossRoom>() != null) {
+
+				StopCoroutine(this.followPlayerCR);
+				this.followingPlayer = false;
+
+				float x = coll.transform.position.x;
+				float y = coll.transform.position.y;
+				float z = this.transform.position.z;
+				this.transform.position = new Vector3(x, y, z);
+			}
+			else if(this.followingPlayer == false) {
+
+				StartCoroutine(this.followPlayerCR);
+			}
 		}
 	}
 	#endregion
@@ -32,6 +52,7 @@ public class CameraManager : MonoBehaviour {
 	#region CoRoutines
 	private IEnumerator FollowPlayer() {
 
+		this.followingPlayer = true;
 		while(true) {
 
 			if(this.boundry != null && this.player != null) {

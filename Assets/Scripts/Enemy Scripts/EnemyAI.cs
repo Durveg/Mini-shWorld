@@ -82,11 +82,11 @@ public class EnemyAI : MonoBehaviour {
 			}
 			else {
 				
-				Vector2 dir = (this.path.vectorPath[currentWaypoint] - this.transform.localPosition).normalized;
+				Vector2 dir = (this.path.vectorPath[currentWaypoint] - this.transform.position).normalized;
 				dir *= this.speed * Time.fixedDeltaTime;
 
 				this.rBody.AddForce(dir, this.fMode);
-				if(Vector2.Distance(this.transform.localPosition, this.path.vectorPath[currentWaypoint]) < this.nextWaypointDistance) {
+				if(Vector2.Distance(this.transform.position, this.path.vectorPath[currentWaypoint]) < this.nextWaypointDistance) {
 
 					this.currentWaypoint++;
 				}
@@ -105,7 +105,7 @@ public class EnemyAI : MonoBehaviour {
 			}
 			else {
 
-				seeker.StartPath(this.transform.localPosition, player.transform.localPosition, OnPathComplete);
+				seeker.StartPath(this.transform.position, player.transform.position, OnPathComplete);
 				yield return new WaitForSeconds(1f / updateRate);
 			}
 		}

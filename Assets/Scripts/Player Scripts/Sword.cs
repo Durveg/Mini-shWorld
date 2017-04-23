@@ -54,13 +54,10 @@ public class Sword : MonoBehaviour {
 
 	private IEnumerator MoveSwordOut() {
 
+		this.swordCollider.enabled = true;
 		while(true) {
 	
 			float dis = Vector2.Distance(this.transform.localPosition, this.endPosition);
-			if(dis / totalDistance < .5) {
-
-				this.swordCollider.enabled = true;
-			}
 
 			if(dis < 0.005f) {
 
@@ -72,7 +69,7 @@ public class Sword : MonoBehaviour {
 			this.transform.localPosition = Vector2.MoveTowards(this.transform.localPosition, this.endPosition, this.swingSpeed * Time.deltaTime);
 			yield return null;
 		}
-
+		this.swordCollider.enabled = false;
 
 		StartCoroutine(MoveSwordIn());
 	}
