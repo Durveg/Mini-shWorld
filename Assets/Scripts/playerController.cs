@@ -20,6 +20,7 @@ public class playerController : MonoBehaviour {
 	private Rigidbody2D rBody = null;
 	public SpriteRenderer sprite = null;
 	private HookShot hookShot = null;
+	private Sword sword = null;
 
 	private float gravityScale = 0;
 	public float ladderSpeed = 2;
@@ -31,6 +32,7 @@ public class playerController : MonoBehaviour {
 		this.rBody = this.GetComponent<Rigidbody2D>();
 		this.sprite = this.GetComponentInChildren<SpriteRenderer>();
 		this.hookShot = this.GetComponentInChildren<HookShot>();
+		this.sword = this.GetComponentInChildren<Sword>();
 
 		this.gravityScale = this.rBody.gravityScale;
 	}
@@ -43,6 +45,11 @@ public class playerController : MonoBehaviour {
 			if(Input.GetKeyDown(KeyCode.Q)) {
 
 				this.hookShot.fireHookShot();
+			}
+
+			if(Input.GetKeyDown(KeyCode.LeftShift)) {
+
+				this.sword.SwingSword();
 			}
 
 			if(Input.GetKeyDown(KeyCode.E)) {
@@ -98,10 +105,20 @@ public class playerController : MonoBehaviour {
 				}
 			}
 		}
+		else {
+
+			this.rBody.velocity = Vector2.zero;
+		}
+	}
+
+	public void HealthRegen(float healthRegen) {
+
+		//TODO: Heal 
 	}
 
 	public void TakeDamage() {
 		//TODO: Take Damage
+		Debug.Log("Damage");
 	}
 
 	public void PlayerOnLadder(bool onLadder) {
@@ -119,7 +136,7 @@ public class playerController : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D coll) {
 
-		Debug.Log("Collider Entered");
+		//Debug.Log("Collider Entered");
 		if(this.jumpCharges < this.maxJumpCharges) {
 		
 			this.jumpCharges = this.maxJumpCharges;
@@ -138,11 +155,13 @@ public class playerController : MonoBehaviour {
 		if(this.applyRightForce == true) {
 
 			this.sprite.flipX = false;
+			this.sword.FlipSword(false);
 			this.rBody.AddForce(new Vector2(this.sideSpeed, 0));
 		}
 		else if(this.applyLeftForce == true) {
 
 			this.sprite.flipX = true;
+			this.sword.FlipSword(true);
 			this.rBody.AddForce(new Vector2(-this.sideSpeed,0));
 		}
 

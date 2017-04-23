@@ -5,37 +5,47 @@ using UnityEngine;
 public class Bomb : MonoBehaviour {
 
 	public float explosionTimer = 1;
-	private Collider2D explosionCollider = null;
-
+	private ArrayList collisions = null;
 	// Use this for initialization
 	void Start () {
 
-		this.explosionCollider = this.GetComponent<CircleCollider2D>();
+		collisions = new ArrayList();
 		StartCoroutine(this.ExplosionTimer());
 	}
 
 	private void Explode() {
 
-		Collider2D[] collisions = null;
-		explosionCollider.OverlapCollider(null, collisions);
 
-		foreach(Collider2D coll in collisions) {
+		for(int i = 0; i < collisions.Count; i++){
 
-			BombWall wall = coll.gameObject.GetComponent<BombWall>();
-			if(wall != null) {
+			Collider2D coll = (Collider2D)collisions[i];
+			if(coll != null) {
+				BombWall wall = coll.gameObject.GetComponent<BombWall>();
+				if(wall != null) {
 
-				wall.BlownUp();
-			}
+					GameObject.Destroy(wall.gameObject);
+				}
 
-			playerController player = coll.GetComponent<playerController>();
-			if(player != null) {
+				playerController player = coll.GetComponent<playerController>();
+				if(player != null) {
 
-				player.TakeDamage();
+					player.TakeDamage();
+				}
 			}
 		}
 
 		Debug.Log("BOOM");
 		GameObject.Destroy(this.gameObject);
+	}
+
+	void OnTriggerEnter2D(Collider2D  coll) {
+
+		this.collisions.Add(coll);
+	}
+
+	void OnTriggerExit2D(Collider2D  coll) {
+
+		this.collisions.Remove(coll);
 	}
 
 	private IEnumerator ExplosionTimer() {

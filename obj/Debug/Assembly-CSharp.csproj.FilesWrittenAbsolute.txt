@@ -20,3 +20,4 @@
 /Users/Cameron/Documents/Programming Files/Unity Projects/LudumDare38/Temp/bin/Debug/Unity.CecilTools.dll
 /Users/Cameron/Documents/Programming Files/Unity Projects/LudumDare38/Temp/bin/Debug/Mono.Cecil.Pdb.dll
 /Users/Cameron/Documents/Programming Files/Unity Projects/LudumDare38/Temp/bin/Debug/Mono.Cecil.Mdb.dll
+/Users/Cameron/Documents/Programming Files/Unity Projects/LudumDare38/Temp/bin/Debug/Pathfinding.Ionic.Zip.Reduced.dll

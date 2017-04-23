@@ -32,12 +32,13 @@ public class HookShot : MonoBehaviour {
 	}
 
 	public void fireHookShot() {
-		Vector2 direction = Vector2.right;
+		
 
 		if(this.sprite == null) {
 			this.getPlayerSprite();
 		}
 
+		Vector2 direction = Vector2.right;
 		if(this.sprite.flipX) {
 			direction = Vector2.left;
 		}
@@ -45,26 +46,35 @@ public class HookShot : MonoBehaviour {
 		Vector2 rayStart = new Vector2(this.transform.parent.localPosition.x + .5f * direction.x, this.transform.parent.localPosition.y);
 		RaycastHit2D rayHit = Physics2D.Raycast(rayStart, direction);
 
-		Vector2 endHookPosition = new Vector2(this.transform.parent.localPosition.x + 4.5f * direction.x, this.transform.parent.localPosition.y);
-		if(rayHit != null && rayHit.collider != null && rayHit.collider.gameObject.name == "GrapplePoint") {
-
-			if(Vector2.Distance(this.transform.parent.localPosition, rayHit.collider.gameObject.transform.localPosition) < 4.5f) {
-				endHookPosition = rayHit.collider.gameObject.transform.localPosition;
-			}
-		}
 
 		Vector3[] positions = new Vector3[2];
 		positions[0] = this.transform.parent.localPosition;
 		positions[1] = this.transform.parent.localPosition;
 		this.hookShotLine.SetPositions(positions);
 
-		this.hookShotCoRoutine = this.HookShotFired(endHookPosition);
+		this.hookShotCoRoutine = this.HookShotFired(rayHit.collider);
 		StartCoroutine(this.hookShotCoRoutine);
 	}
 
-	private IEnumerator HookShotFired(Vector2 endPosition) {
+	private IEnumerator HookShotFired(Collider2D hitPosition) {
 
 		this.hookShotLine.enabled = true;
+		this.hookShotCoRoutine = this.HookShotRetract();
+
+		Vector2 direction = Vector2.right;
+		if(this.sprite.flipX) {
+			direction = Vector2.left;
+		}
+
+		Vector2 endPosition = new Vector2(this.transform.parent.localPosition.x + 4.5f * direction.x, this.transform.parent.localPosition.y);
+		if(hitPosition != null &&  hitPosition.transform.name == "GrapplePoint") {
+			
+			if(Vector2.Distance(this.transform.parent.localPosition, hitPosition.transform.localPosition) < 4.5f) {
+			
+				endPosition = hitPosition.transform.localPosition;
+				this.hookShotCoRoutine = this.HookShotPulled(endPosition);
+			}
+		}
 
 		float hookShotSpeed = 35;
 		while(true) {
@@ -75,18 +85,10 @@ public class HookShot : MonoBehaviour {
 			}
 
 			Vector2 newEndPoint = Vector2.MoveTowards(this.hookShotLine.GetPosition(1), endPosition, hookShotSpeed * Time.deltaTime);
+			this.hookShotLine.SetPosition(0, this.transform.parent.localPosition);
 			this.hookShotLine.SetPosition(1, newEndPoint);
 
 			yield return null;
-		}
-
-		if(Vector2.Distance(this.hookShotLine.GetPosition(0), this.hookShotLine.GetPosition(1)) < 4.5) {
-
-			this.hookShotCoRoutine = this.HookShotPulled(endPosition);
-		}
-		else {
-
-			this.hookShotCoRoutine = this.HookShotRetract();
 		}
 
 		StartCoroutine(this.hookShotCoRoutine);
@@ -124,6 +126,7 @@ public class HookShot : MonoBehaviour {
 			}
 
 			Vector2 newPosition = Vector2.MoveTowards(this.hookShotLine.GetPosition(1), this.hookShotLine.GetPosition(0), hookShotSpeed * Time.deltaTime);
+			this.hookShotLine.SetPosition(0, this.transform.parent.localPosition);
 			this.hookShotLine.SetPosition(1, newPosition);
 
 			yield return null;
