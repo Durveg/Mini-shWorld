@@ -4,40 +4,22 @@ using UnityEngine;
 
 public class HookShot : MonoBehaviour {
 
-
+	#region Public Variables
 	public bool hookShotActive
 	{
 		get { return this.hookShotCoRoutine != null; }
 	}
+	#endregion
 
+	#region Private Variables
 	private LineRenderer hookShotLine = null;
 	private IEnumerator hookShotCoRoutine = null;
 	private SpriteRenderer sprite = null;
-	private playerController player = null;
-	// Use this for initialization
-	void Start () {
+	private PlayerController player = null;
+	#endregion
 
-		this.hookShotLine = this.GetComponentInChildren<LineRenderer>();
-		this.player = this.GetComponentInParent<playerController>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-
-	private void getPlayerSprite() {
-
-		this.sprite = this.player.sprite;
-	}
-
+	#region Public Methods
 	public void fireHookShot() {
-		
-
-		if(this.sprite == null) {
-			this.getPlayerSprite();
-		}
 
 		Vector2 direction = Vector2.right;
 		if(this.sprite.flipX) {
@@ -57,7 +39,19 @@ public class HookShot : MonoBehaviour {
 		this.hookShotCoRoutine = this.HookShotFired(rayHit.collider);
 		StartCoroutine(this.hookShotCoRoutine);
 	}
+	#endregion
 
+	#region Unity Methods
+	void Start () {
+
+		this.hookShotLine = this.GetComponentInChildren<LineRenderer>();
+		this.player = this.GetComponentInParent<PlayerController>();
+		this.sprite = this.player.sprite;
+	}
+
+	#endregion
+
+	#region CoRoutines
 	private IEnumerator HookShotFired(Collider2D hitPosition) {
 
 		this.hookShotLine.enabled = true;
@@ -69,7 +63,7 @@ public class HookShot : MonoBehaviour {
 		}
 
 		Vector2 endPosition = new Vector2(this.transform.parent.localPosition.x + 3f * direction.x, this.transform.parent.localPosition.y);
-		if(hitPosition != null &&  hitPosition.transform.name == "GrapplePoint") {
+		if(hitPosition != null && hitPosition.transform.name == "GrapplePoint") {
 			
 			if(Vector2.Distance(this.transform.parent.localPosition, hitPosition.transform.localPosition) < 6f) {
 			
@@ -77,7 +71,7 @@ public class HookShot : MonoBehaviour {
 				this.hookShotCoRoutine = this.HookShotPulled(endPosition);
 			}
 		}
-
+			
 		float hookShotSpeed = 35;
 		while(true) {
 
@@ -93,12 +87,15 @@ public class HookShot : MonoBehaviour {
 			yield return null;
 		}
 
+		//TODO: Add damage to hitting an enemy with the hookshot
+
 		StartCoroutine(this.hookShotCoRoutine);
 	}
 
 	private IEnumerator HookShotPulled(Vector2 endPosition) {
 
-		this.player.ZeroVelocity();
+		this.player.ZeroOutVelocity();
+
 		float hookPullSpeed = 25;
 		while(true) {
 
@@ -138,4 +135,5 @@ public class HookShot : MonoBehaviour {
 		this.hookShotCoRoutine = null;
 		this.hookShotLine.enabled = false;
 	}
+	#endregion
 }

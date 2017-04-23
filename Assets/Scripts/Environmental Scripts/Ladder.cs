@@ -4,18 +4,21 @@ using UnityEngine;
 
 public class Ladder : MonoBehaviour {
 
-	playerController player = null;
+	#region Private Variables
+	private PlayerController player = null;
+	#endregion
 
+	#region Unity Methods
 	void OnTriggerEnter2D(Collider2D  coll) {
 
 		if(coll.gameObject.name == "Player") {
 
-			if(player == null) {
-				player = coll.gameObject.GetComponent<playerController>();
+			if(this.player == null) {
+				this.player = coll.gameObject.GetComponent<PlayerController>();
 			}
 
 			Debug.Log("Player on ladder");
-			player.PlayerOnLadder(true);
+			this.player.PlayerOnLadder(true);
 		}
 	}
 
@@ -24,12 +27,13 @@ public class Ladder : MonoBehaviour {
 
 		if(coll.gameObject.name == "Player") {
 
-			if(player == null) {
-				player = coll.gameObject.GetComponent<playerController>();
+			if(this.player == null) {
+				this.player = coll.gameObject.GetComponent<PlayerController>();
 			}
 
 			Debug.Log("Player off ladder");
-			player.PlayerOnLadder(false);
+			this.player.PlayerOnLadder(false);
 		}
 	}
+	#endregion
 }

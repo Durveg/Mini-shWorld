@@ -2,36 +2,89 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class playerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
 
-	public int health = 10;
-
-	public float jumpHeight = 350;
-	public float sideSpeed = 25;
+	#region Constants
 	public float MAX_VELOCITY_X = 5;
 	public float MAX_INVULN_TIME = 0.5f;
 
+	#region Public Variables
+	public bool onLadder = false;
+
+	public int health = 10;
+	public int jumpCharges = 1;
+	public int maxJumpCharges = 1;
+
+	public float jumpHeight = 350;
+	public float sideSpeed = 25;
+	public float ladderSpeed = 2;
+
+	public SpriteRenderer sprite = null;
+
+	#region Private Variables
 	private bool invuln = false;
 	private bool applyUpForce = false;
 	private bool applyRightForce = false;
 	private bool applyLeftForce = false;
 	private bool applyDownForce = false;
-
-	public int jumpCharges = 1;
-	public int maxJumpCharges = 1;
 	private bool jump = false;
 
+	private float gravityScale = 0;
+
 	private Rigidbody2D rBody = null;
-	public SpriteRenderer sprite = null;
 	private HookShot hookShot = null;
 	private Sword sword = null;
 	private UIManager uiManager = null;
 
-	private float gravityScale = 0;
-	public float ladderSpeed = 2;
-	public bool onLadder = false;
+	#region Delegates
+	public delegate void BoundriesUpdated(Collider2D coll);
+	public event BoundriesUpdated boundriesUpdated;
 
-	// Use this for initialization
+	#region Public Methods
+	public void ZeroOutVelocity() {
+
+		this.rBody.velocity = Vector2.zero;
+	}
+
+	public void AdjustHealth(float adjustment) {
+
+		this.health += (int)(adjustment * 2);
+		this.uiManager.AdjustHearts(adjustment);
+	}
+
+	public void HealthRegen(float healthRegen) {
+
+		this.AdjustHealth(healthRegen);
+	}
+
+	public void TakeDamage(float damage, float knockBackForce, Vector2 damageLocation) {
+
+		if(this.invuln == false) {
+		
+			Vector2 dir = (damageLocation - (Vector2)this.transform.localPosition).normalized * -1;
+			this.rBody.AddForce(dir * knockBackForce, ForceMode2D.Force);
+
+			this.AdjustHealth(-damage);
+
+			StartCoroutine(this.InvulnTimer());
+		}
+	}
+
+	public void PlayerOnLadder(bool onLadder) {
+
+		this.onLadder = onLadder;
+		if(onLadder == true) {
+			
+			this.rBody.gravityScale = 0;
+		}
+		else {
+			
+			this.rBody.gravityScale = this.gravityScale;
+		}
+	}
+	#endregion 
+
+	#region Unity Methods
 	void Start () {
 
 		this.rBody = this.GetComponent<Rigidbody2D>();
@@ -42,11 +95,21 @@ public class playerController : MonoBehaviour {
 		this.uiManager = FindObjectOfType<UIManager>();
 
 		this.gravityScale = this.rBody.gravityScale;
-	
+
 		StartCoroutine(this.CheckForBoundryManager());
 	}
 
-	// Update is called once per frame
+	void OnCollisionEnter2D(Collision2D coll) {
+
+		//Debug.Log("Collider Entered");
+		if(this.jumpCharges < this.maxJumpCharges) {
+
+			this.jumpCharges = this.maxJumpCharges;
+		}
+	}
+	#endregion
+
+	#region Update Methods
 	void Update () {
 
 		if(this.hookShot.hookShotActive == false) {
@@ -75,7 +138,7 @@ public class playerController : MonoBehaviour {
 
 			this.applyUpForce = false;
 			if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) {
-			
+
 				if(this.onLadder == true) {
 
 					this.applyUpForce = true;
@@ -117,93 +180,6 @@ public class playerController : MonoBehaviour {
 		else {
 
 			this.rBody.velocity = Vector2.zero;
-		}
-	}
-
-	private IEnumerator CheckForBoundryManager() {
-
-		while(true) {
-			int mask = 1 << 10;
-			RaycastHit2D hit = Physics2D.Raycast(this.transform.localPosition, Vector2.zero, 0, mask, -10, 10);
-			if(hit != null && hit.collider != null) {
-
-				Camera.main.GetComponent<CameraManager>().BoundriesChanged((BoxCollider2D)hit.collider);
-			}
-
-			yield return null;
-		}
-	}
-
-	public void ZeroVelocity() {
-
-		this.rBody.velocity = Vector2.zero;
-	}
-
-	public void AdjustHealth(float adjustment) {
-
-		this.health += (int)(adjustment * 2);
-		this.uiManager.AdjustHearts(adjustment);
-	}
-
-	public void HealthRegen(float healthRegen) {
-
-		this.AdjustHealth(healthRegen);
-		//TODO: Heal 
-	}
-
-	private IEnumerator InvulnTimer() {
-
-		this.invuln = true;
-		float timer = 0;
-		while(true) {
-
-			timer += Time.deltaTime;
-
-			//TODO: Add flash effect to the invuln
-
-			if(timer >= MAX_INVULN_TIME) {
-
-				break;
-			}
-
-			yield return null;
-		}
-
-		this.invuln = false;
-	}
-
-	public void TakeDamage(float damage, float knockBackForce, Vector2 damageLocation) {
-
-		if(this.invuln == false) {
-		
-			Vector2 dir = (damageLocation - (Vector2)transform.localPosition).normalized * -1;
-			this.rBody.AddForce(dir * knockBackForce, ForceMode2D.Force);
-
-			this.AdjustHealth(-damage);
-
-			StartCoroutine(this.InvulnTimer());
-		}
-	}
-
-	public void PlayerOnLadder(bool onLadder) {
-
-		this.onLadder = onLadder;
-		if(onLadder == true) {
-			
-			this.rBody.gravityScale = 0;
-		}
-		else {
-			
-			this.rBody.gravityScale = this.gravityScale;
-		}
-	}
-
-	void OnCollisionEnter2D(Collision2D coll) {
-
-		//Debug.Log("Collider Entered");
-		if(this.jumpCharges < this.maxJumpCharges) {
-		
-			this.jumpCharges = this.maxJumpCharges;
 		}
 	}
 
@@ -258,4 +234,43 @@ public class playerController : MonoBehaviour {
 			this.rBody.velocity = new Vector3(-MAX_VELOCITY_X, this.rBody.velocity.y);
 		}
 	}
+	#endregion
+
+	#region CoRoutines
+	private IEnumerator InvulnTimer() {
+
+		this.invuln = true;
+		float timer = 0;
+		while(true) {
+
+			timer += Time.deltaTime;
+
+			//TODO: Add flash effect to the invuln
+
+			if(timer >= this.MAX_INVULN_TIME) {
+
+				break;
+			}
+
+			yield return null;
+		}
+
+		this.invuln = false;
+	}
+
+	private IEnumerator CheckForBoundryManager() {
+
+		while(true) {
+
+			int mask = 1 << 10;
+			RaycastHit2D hit = Physics2D.Raycast(this.transform.localPosition, Vector2.zero, 0, mask, -10, 10);
+			if(hit != null && hit.collider != null) {
+
+				this.boundriesUpdated(hit.collider);
+			}
+
+			yield return null;
+		}
+	}
+	#endregion
 }

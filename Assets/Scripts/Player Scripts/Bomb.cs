@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class Bomb : MonoBehaviour {
 
+	#region Public Variables
 	public float bombDamage = 0.5f;
 	public float bombForce = 2;
 	public float explosionTimer = 2;
+	#endregion
+
+	#region Private Variables
 	private ArrayList collisions = null;
-	// Use this for initialization
-	void Start () {
+	#endregion
 
-		collisions = new ArrayList();
-		StartCoroutine(this.ExplosionTimer());
-	}
-
+	#region Private Methods
 	private void Explode() {
 
 
-		for(int i = 0; i < collisions.Count; i++){
+		for(int i = 0; i < this.collisions.Count; i++){
 
 			Collider2D coll = (Collider2D)collisions[i];
 			if(coll != null) {
@@ -28,7 +28,7 @@ public class Bomb : MonoBehaviour {
 					GameObject.Destroy(wall.gameObject);
 				}
 
-				playerController player = coll.GetComponent<playerController>();
+				PlayerController player = coll.GetComponent<PlayerController>();
 				if(player != null) {
 
 					player.TakeDamage(this.bombDamage, this.bombForce, this.transform.localPosition);
@@ -36,8 +36,15 @@ public class Bomb : MonoBehaviour {
 			}
 		}
 
-		Debug.Log("BOOM");
 		GameObject.Destroy(this.gameObject);
+	}
+	#endregion
+
+	#region Unity Methods
+	void Start () {
+
+		this.collisions = new ArrayList();
+		StartCoroutine(this.ExplosionTimer());
 	}
 
 	void OnTriggerEnter2D(Collider2D  coll) {
@@ -49,14 +56,16 @@ public class Bomb : MonoBehaviour {
 
 		this.collisions.Remove(coll);
 	}
+	#endregion
 
+	#region CoRoutines
 	private IEnumerator ExplosionTimer() {
 
 		float timer = 0;
 		while(true) {
 
 			timer += Time.deltaTime;
-			if(timer > explosionTimer) {
+			if(timer > this.explosionTimer) {
 				break;
 			}
 
@@ -65,4 +74,5 @@ public class Bomb : MonoBehaviour {
 
 		this.Explode();
 	}
+	#endregion
 }

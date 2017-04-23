@@ -4,22 +4,32 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour {
 
-	private BoxCollider2D boundry = null;
-	private playerController player = null;
+	#region Private Variables
+	private Collider2D boundry = null;
+	private PlayerController player = null;
+	#endregion
 
+	#region Unity Methods
 	void Start () {
 
-		StartCoroutine(this.GetPlayerRef());
-		StartCoroutine(this.FollowPlayer());
+		StartCoroutine(this.GetPlayerRef()); //Get the reference to the player in a coroutine incase the camera is loaded before the player
+		StartCoroutine(this.FollowPlayer()); //Start following the player (does check for null pointers)
 	}
+	#endregion
 
-	public void BoundriesChanged(BoxCollider2D coll) {
+	#region Private Methods
+	/**
+	 * Delegate method from the PlayerManager script, used to create the metroid style camera.
+	 */
+	private void BoundriesChanged(Collider2D coll) {
 
 		if(this.boundry != coll) {
-			boundry = coll;
+			this.boundry = coll;
 		}
 	}
+	#endregion
 
+	#region CoRoutines
 	private IEnumerator FollowPlayer() {
 
 		while(true) {
@@ -43,8 +53,12 @@ public class CameraManager : MonoBehaviour {
 	private IEnumerator GetPlayerRef() {
 
 		while(this.player == null) {
-			this.player = FindObjectOfType<playerController>();
+			
+			this.player = FindObjectOfType<PlayerController>();
+			this.player.boundriesUpdated += this.BoundriesChanged;
+
 			yield return null;
 		}
 	}
+	#endregion
 }
