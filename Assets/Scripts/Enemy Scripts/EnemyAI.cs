@@ -44,7 +44,8 @@ public class EnemyAI : MonoBehaviour {
 		this.seeker = GetComponent<Seeker>();
 		this.rBody = GetComponent<Rigidbody2D>();
 	
-		StartCoroutine(UpdatePath());
+		StartCoroutine(this.GetPlayerRef());
+		StartCoroutine(this.UpdatePath());
 	}
 
 	void OnTriggerEnter2D(Collider2D  coll) {
@@ -73,7 +74,7 @@ public class EnemyAI : MonoBehaviour {
 		}
 		else if(this.path != null) {
 
-			if(this.currentWaypoint >= this.path.vectorPath.Count && this.pathIsEnded == false) {
+			if(this.currentWaypoint >= this.path.vectorPath.Count) {
 
 				Debug.Log("End of path reached.");
 				this.pathIsEnded = true;

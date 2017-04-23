@@ -45,13 +45,27 @@ public class HookShot : MonoBehaviour {
 	void Start () {
 
 		this.hookShotLine = this.GetComponentInChildren<LineRenderer>();
-		this.player = this.GetComponentInParent<PlayerController>();
-		this.sprite = this.player.sprite;
+		StartCoroutine(this.GetPlayerRef());
 	}
-
 	#endregion
 
 	#region CoRoutines
+	private IEnumerator GetPlayerRef() {
+
+		while(true) {
+
+			if(this.player != null && this.sprite != null) {
+
+				break;
+			}
+
+			this.player = this.GetComponentInParent<PlayerController>();
+			this.sprite = this.player.sprite;
+
+			yield return null;
+		}
+	}
+
 	private IEnumerator HookShotFired(Collider2D hitPosition) {
 
 		this.hookShotLine.enabled = true;
@@ -65,9 +79,9 @@ public class HookShot : MonoBehaviour {
 		Vector2 endPosition = new Vector2(this.transform.parent.localPosition.x + 3f * direction.x, this.transform.parent.localPosition.y);
 		if(hitPosition != null && hitPosition.transform.name == "GrapplePoint") {
 			
-			if(Vector2.Distance(this.transform.parent.localPosition, hitPosition.transform.localPosition) < 6f) {
+			if(Vector2.Distance(this.transform.parent.localPosition, hitPosition.transform.position) < 6f) {
 			
-				endPosition = hitPosition.transform.localPosition;
+				endPosition = hitPosition.transform.position;
 				this.hookShotCoRoutine = this.HookShotPulled(endPosition);
 			}
 		}

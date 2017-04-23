@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour {
 	#region Constants
 	public float MAX_VELOCITY_X = 5;
 	public float MAX_INVULN_TIME = 0.5f;
+	#endregion
 
 	#region Public Variables
 	public bool onLadder = false;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour {
 	public float ladderSpeed = 2;
 
 	public SpriteRenderer sprite = null;
+	#endregion
 
 	#region Private Variables
 	private bool invuln = false;
@@ -35,10 +37,12 @@ public class PlayerController : MonoBehaviour {
 	private HookShot hookShot = null;
 	private Sword sword = null;
 	private UIManager uiManager = null;
+	#endregion
 
 	#region Delegates
 	public delegate void BoundriesUpdated(Collider2D coll);
 	public event BoundriesUpdated boundriesUpdated;
+	#endregion
 
 	#region Public Methods
 	public void ZeroOutVelocity() {
