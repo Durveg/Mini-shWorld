@@ -36,7 +36,7 @@ public class Enemy : MonoBehaviour {
 			if(rand == 1) {
 
 				GameObject heart = Instantiate((GameObject)Resources.Load("Heart"));
-				heart.transform.localPosition = this.transform.localPosition;
+				heart.transform.localPosition = this.transform.parent.localPosition;
 			}
 
 			this.DeactivateEnemy();
@@ -78,7 +78,7 @@ public class Enemy : MonoBehaviour {
 
 		this.ActivateEnemy();
 
-		this.transform.position = this.startPos;
+		this.transform.parent.position = this.startPos;
 		this.health = this.startHealth;
 	}
 
@@ -91,13 +91,13 @@ public class Enemy : MonoBehaviour {
 	void Start() {
 
 		this.startHealth = this.health;
-		this.startPos = this.transform.position;
+		this.startPos = this.transform.parent.position;
 
-		this.sprite = this.GetComponent<SpriteRenderer>();
-		this.rBody = this.GetComponent<Rigidbody2D>();
-		this.colliders = this.GetComponents<Collider2D>();
+		this.sprite = this.transform.parent.GetComponent<SpriteRenderer>();
+		this.rBody = this.transform.parent.GetComponent<Rigidbody2D>();
+		this.colliders = this.transform.parent.GetComponents<Collider2D>();
 
-		this.damageSprite = this.transform.GetChild(0).GetComponent<SpriteRenderer>();
+		this.damageSprite = this.transform.parent.GetChild(0).GetComponent<SpriteRenderer>();
 		this.damageSprite.enabled = false;
 
 		if(this.zoneManager != null) {
