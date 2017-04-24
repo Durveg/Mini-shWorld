@@ -35,6 +35,15 @@ public class FishBoss : Enemy {
 		GameObject.Destroy(this.gameObject);
 	}
 
+	void OnCollisionEnter2D(Collision2D coll) {
+
+		PlayerController player = coll.gameObject.GetComponent<PlayerController>();
+		if(player != null) {
+
+			player.TakeDamage(this.damageDone, this.knockBackValue, this.transform.localPosition);
+		}
+	}
+
 	public void StartBossFight() {
 
 		if(bossFightStarted == false) {

@@ -39,6 +39,15 @@ public class SpiderBoss : Enemy {
 		StartCoroutine(this.WaitCooldown());
 	}
 
+	void OnCollisionEnter2D(Collision2D coll) {
+
+		PlayerController player = coll.gameObject.GetComponent<PlayerController>();
+		if(player != null) {
+
+			player.TakeDamage(this.damageDone, this.knockBackValue, this.transform.localPosition);
+		}
+	}
+
 	private void FireVenomShot() {
 
 		SoundManager.instance.PlayVenom();

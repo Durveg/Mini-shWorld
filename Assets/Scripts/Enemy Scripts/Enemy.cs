@@ -18,6 +18,8 @@ public class Enemy : MonoBehaviour {
 
 	private Vector2 startPos;
 
+	private Collider2D damageCollider = null;
+
 	private Rigidbody2D rBody = null;
 	protected SpriteRenderer sprite = null;
 	protected SpriteRenderer damageSprite = null;
@@ -56,6 +58,7 @@ public class Enemy : MonoBehaviour {
 			coll.enabled = false;
 		}
 
+		this.damageCollider.enabled = false;
 		this.rBody.velocity = Vector2.zero;
 		this.rBody.isKinematic = true;
 		this.sprite.enabled = false;
@@ -68,6 +71,7 @@ public class Enemy : MonoBehaviour {
 			coll.enabled = true;
 		}
 
+		this.damageCollider.enabled = true;
 		this.rBody.isKinematic = false;
 		this.sprite.enabled = true;
 	}
@@ -97,6 +101,8 @@ public class Enemy : MonoBehaviour {
 		this.rBody = this.transform.parent.GetComponent<Rigidbody2D>();
 		this.colliders = this.transform.parent.GetComponents<Collider2D>();
 
+		this.damageCollider = this.transform.GetComponent<Collider2D>();
+
 		this.damageSprite = this.transform.parent.GetChild(0).GetComponent<SpriteRenderer>();
 		this.damageSprite.enabled = false;
 
@@ -107,7 +113,7 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 		
-	void OnCollisionEnter2D(Collision2D coll) {
+	void OnTriggerEnter2D(Collider2D coll) {
 
 		PlayerController player = coll.gameObject.GetComponent<PlayerController>();
 		if(player != null) {

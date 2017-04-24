@@ -44,6 +44,15 @@ public class RatBoss : Enemy {
 		}
 	}
 
+	void OnCollisionEnter2D(Collision2D coll) {
+
+		PlayerController player = coll.gameObject.GetComponent<PlayerController>();
+		if(player != null) {
+
+			player.TakeDamage(this.damageDone, this.knockBackValue, this.transform.localPosition);
+		}
+	}
+
 	private IEnumerator WaitCooldown() {
 
 		float timer = 0;
