@@ -47,6 +47,8 @@ public class Sword : MonoBehaviour {
 	public void SwingSword() {
 
 		if(swordSwinging == false) {
+
+			SoundManager.instance.PlaySword();
 			swordSwinging = true;
 			StartCoroutine(this.MoveSwordOut());
 		}

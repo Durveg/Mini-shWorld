@@ -19,18 +19,20 @@ public class Enemy : MonoBehaviour {
 	private Vector2 startPos;
 
 	private Rigidbody2D rBody = null;
-	private SpriteRenderer sprite = null;
+	protected SpriteRenderer sprite = null;
+	protected SpriteRenderer damageSprite = null;
 	#endregion
 
 	#region Public Methods
 	public void DamageDealt(float damageValue) {
 
 		this.health -= damageValue;
+
 		if(this.health < 0) {
 
 			//TODO: Add death animation
 
-			int rand = Random.Range(1,3);
+			int rand = Random.Range(1, 3);
 			if(rand == 1) {
 
 				GameObject heart = Instantiate((GameObject)Resources.Load("Heart"));
@@ -38,6 +40,10 @@ public class Enemy : MonoBehaviour {
 			}
 
 			this.DeactivateEnemy();
+		}
+		else {
+
+			StartCoroutine(this.FlashBody());
 		}
 	}
 	#endregion
@@ -91,6 +97,9 @@ public class Enemy : MonoBehaviour {
 		this.rBody = this.GetComponent<Rigidbody2D>();
 		this.colliders = this.GetComponents<Collider2D>();
 
+		this.damageSprite = this.transform.GetChild(0).GetComponent<SpriteRenderer>();
+		this.damageSprite.enabled = false;
+
 		if(this.zoneManager != null) {
 			
 			this.zoneManager.zoneActivated += ZoneActivated;
@@ -105,6 +114,15 @@ public class Enemy : MonoBehaviour {
 
 			player.TakeDamage(this.damageDone, this.knockBackValue, this.transform.localPosition);
 		}
+	}
+	#endregion
+
+	#region CoRoutines
+	private IEnumerator FlashBody() {
+
+		this.damageSprite.enabled = true;
+		yield return new WaitForSeconds(0.15f);
+		this.damageSprite.enabled = false;
 	}
 	#endregion
 }

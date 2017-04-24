@@ -17,11 +17,15 @@ public class SpiderBoss : Enemy {
 
 		this.health = 3;
 		this.bossRoom.bossTriggered += StartBossFight;
+
+		this.damageSprite = this.transform.GetChild(0).GetComponent<SpriteRenderer>();
+		this.damageSprite.enabled = false;
 	}
 		
 	protected override void DeactivateEnemy() {
 
 		this.bossRoom.bossTriggered -= StartBossFight;
+		UIManager.instance.BossDefeated();
 
 		GameObject heart = Instantiate((GameObject)Resources.Load("Heart"));
 		heart.transform.position = this.transform.position;
@@ -37,6 +41,7 @@ public class SpiderBoss : Enemy {
 
 	private void FireVenomShot() {
 
+		SoundManager.instance.PlayVenom();
 		GameObject venom = Instantiate((GameObject)Resources.Load("Venom"));
 		venom.transform.position = spawnLocation;
 		venom.GetComponent<Rigidbody2D>().AddForce(Vector2.right * this.venomSpeed);

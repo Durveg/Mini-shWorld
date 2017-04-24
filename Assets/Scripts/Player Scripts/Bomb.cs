@@ -17,15 +17,23 @@ public class Bomb : MonoBehaviour {
 	#region Private Methods
 	private void Explode() {
 
+		SoundManager.instance.PlayExplosion();
 
 		for(int i = 0; i < this.collisions.Count; i++){
 
 			Collider2D coll = (Collider2D)collisions[i];
 			if(coll != null) {
+				
 				BombWall wall = coll.gameObject.GetComponent<BombWall>();
 				if(wall != null) {
 
 					GameObject.Destroy(wall.gameObject);
+				}
+
+				Enemy e = coll.gameObject.GetComponent<Enemy>();
+				if(e != null) {
+
+					e.DamageDealt(1);
 				}
 
 				PlayerController player = coll.GetComponent<PlayerController>();

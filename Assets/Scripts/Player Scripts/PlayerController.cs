@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour {
 	#region Public Variables
 	public bool onLadder = false;
 
-	public int health = 10;
+	public int health = 5;
 	public int jumpCharges = 1;
 	public int maxJumpCharges = 1;
 
@@ -45,6 +45,12 @@ public class PlayerController : MonoBehaviour {
 	#endregion
 
 	#region Public Methods
+	public void KillPlayer() {
+
+		GameObject.Destroy(this.gameObject);
+		this.uiManager.GameOver();
+	}
+
 	public void ZeroOutVelocity() {
 
 		this.rBody.velocity = Vector2.zero;
@@ -54,10 +60,16 @@ public class PlayerController : MonoBehaviour {
 
 		this.health += (int)(adjustment * 2);
 		this.uiManager.AdjustHearts(adjustment);
+
+		if(this.health <= 0) {
+
+			this.KillPlayer();
+		}
 	}
 
 	public void HealthRegen(float healthRegen) {
 
+		SoundManager.instance.PlayHealth();
 		this.AdjustHealth(healthRegen);
 	}
 
@@ -65,6 +77,8 @@ public class PlayerController : MonoBehaviour {
 
 		if(this.invuln == false) {
 		
+			SoundManager.instance.playHurt();
+
 			Vector2 dir = (damageLocation - (Vector2)this.transform.localPosition).normalized * -1;
 			this.rBody.AddForce(dir * knockBackForce, ForceMode2D.Force);
 
@@ -120,7 +134,7 @@ public class PlayerController : MonoBehaviour {
 
 			if(Input.GetKeyDown(KeyCode.Q)) {
 
-				this.hookShot.fireHookShot();
+				//this.hookShot.fireHookShot();
 			}
 
 			if(Input.GetKeyDown(KeyCode.LeftShift)) {
@@ -163,6 +177,15 @@ public class PlayerController : MonoBehaviour {
 				//TODO: Move left
 			}
 
+			if(Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)) {
+
+				SoundManager.instance.enableStep(true);
+			}
+			else {
+
+				SoundManager.instance.enableStep(false);
+			}
+
 			this.applyDownForce = false;
 			if(Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) {
 
@@ -177,6 +200,7 @@ public class PlayerController : MonoBehaviour {
 
 				if(this.jumpCharges > 0 && this.onLadder == false) {
 
+					SoundManager.instance.playJump();
 					this.jump = true;
 				}
 			}
@@ -268,7 +292,10 @@ public class PlayerController : MonoBehaviour {
 			RaycastHit2D hit = Physics2D.Raycast(this.transform.localPosition, Vector2.zero, 0, mask, -10, 10);
 			if(hit != null && hit.collider != null) {
 
-				this.boundriesUpdated(hit.collider);
+				if(this.boundriesUpdated != null) {
+				
+					this.boundriesUpdated(hit.collider);
+				}
 			}
 
 			yield return null;
